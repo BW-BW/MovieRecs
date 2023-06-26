@@ -5,4 +5,14 @@
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+
+    <button class="btn-info" asp-action="CallApi" asp-controller="Home">Call Api</button>
+@*    <form method="post">
+        <button type="submit" formaction="@Url.Action("CallApi", "Home")">Call API</button>
+    </form>*@
+
+    <form method="post" action="@Url.Action("CallApi", "Home")">
+        <button type="submit">Call API</button>
+    </form>
 </div>
+
