@@ -28,47 +28,8 @@ namespace MovieRecs.Controllers
             _context = context;
         }
 
-        /*public async Task<IActionResult> GetCurrentUser(String  username)
+        public async Task<string> CallApiGenre(string genre)
         {
-            if (username == null || _context.User == null)
-            {
-                return NotFound();
-            }
-
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Username == username);
-            if (user == null)
-            {
-                return NotFound();
-            }
-
-            return View(user);
-        }*/
-
-        public async Task<List<User>> GetCurrentUser(string username)
-        {
-            if (username == null || _context.User == null)
-            {
-                return null;
-            }
-
-            var user = await _context.User
-                .FirstOrDefaultAsync(m => m.Username == username);
-            if (user == null)
-            {
-                return null;
-            }
-
-            return new List<User> { user };
-        }
-
-        public async Task<string> CallApiGen1()
-        {
-            var userdata = await GetCurrentUser("Brian");
-            System.Diagnostics.Debug.WriteLine("kontoolll");
-            System.Diagnostics.Debug.WriteLine(userdata);
-            string genre = userdata[0].Genre1;
-
             string apiUrl = "https://moviesminidatabase.p.rapidapi.com/movie/byGen/" + genre + "/";
 
             HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
@@ -91,41 +52,36 @@ namespace MovieRecs.Controllers
             }
         }
 
-        public async Task<string> CallApiGen2()
+        public async Task<IActionResult> CallApi(string[] selectedGenres)
         {
-            var userdata = await GetCurrentUser("Brian");
-            System.Diagnostics.Debug.WriteLine("kontoolll");
-            System.Diagnostics.Debug.WriteLine(userdata);
-            string genre = userdata[0].Genre2;
+            string[] genrezz = ProcessGenres(selectedGenres);
+            string responseBody = "";
+            string json = "";
+            ViewData["errors"] = "";
 
-            string apiUrl = "https://moviesminidatabase.p.rapidapi.com/movie/byGen/" + genre + "/";
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
-            request.Headers.Add("X-RapidAPI-Key", "87429eac32msh305b85d98fca914p1122fajsnad4deb35ba9c");
-            request.Headers.Add("X-RapidAPI-Host", "moviesminidatabase.p.rapidapi.com");
-
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
+            if (genrezz.Length == 1)
             {
-                // Read first response content
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                return responseBody;
+                responseBody = await CallApiGenre(genrezz[0]);
+                json = "[" + responseBody + "]";
+            } else if (genrezz.Length == 2)
+            {
+                responseBody = await CallApiGenre(genrezz[0]);
+                string responseBody2 = await CallApiGenre(genrezz[1]);
+                json = "[" + responseBody + "," + responseBody2 + "]";
+            } else if (genrezz.Length == 3) 
+            {
+                responseBody = await CallApiGenre(genrezz[0]);
+                string responseBody2 = await CallApiGenre(genrezz[1]);
+                string responseBody3 = await CallApiGenre(genrezz[2]);
+                json = "[" + responseBody + "," + responseBody2 + "," + responseBody3 + "]";
+            } else if (genrezz.Length > 3)
+            {
+                ViewData["errors"] = "Choose Maximum 3 Category";
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("boo");
-                return ("WTF");
+                ViewData["errors"] = "Choose Atleast 1 Category";
             }
-        }
-
-        public async Task<IActionResult> CallApi()
-        {
-            string responseBody = await CallApiGen2();
-            string responseBody2 = await CallApiGen1();
-
-            string json = "[" + responseBody + "," + responseBody2 + "]";
 
             if (responseBody != null)
             {
@@ -138,34 +94,12 @@ namespace MovieRecs.Controllers
 
         }
 
-        /*public async Task<IActionResult> CallApi()
+        [HttpPost]
+        public string[] ProcessGenres(string[] selectedGenres)
         {
-            var userdata = await GetCurrentUser("Brian");
-            System.Diagnostics.Debug.WriteLine("kontoolll");
-            System.Diagnostics.Debug.WriteLine(userdata);
-            string genre = userdata[0].Genre2;
-
-            string apiUrl = "https://moviesminidatabase.p.rapidapi.com/movie/byGen/" + genre + "/";
-
-            HttpRequestMessage request = new HttpRequestMessage(HttpMethod.Get, apiUrl);
-            request.Headers.Add("X-RapidAPI-Key", "87429eac32msh305b85d98fca914p1122fajsnad4deb35ba9c");
-            request.Headers.Add("X-RapidAPI-Host", "moviesminidatabase.p.rapidapi.com");
-
-            HttpResponseMessage response = await _httpClient.SendAsync(request);
-
-            if (response.IsSuccessStatusCode)
-            {
-                // Read first response content
-                string responseBody = await response.Content.ReadAsStringAsync();
-
-                return View("CallApi", responseBody);
-            }
-            else
-            {
-                System.Diagnostics.Debug.WriteLine("boo");
-                return StatusCode((int)response.StatusCode);
-            }
-        }*/
+            string[] chosenGenres = selectedGenres.ToArray();
+            return chosenGenres;
+        }
 
         public IActionResult Index()
         {

@@ -1,4 +1,13 @@
 ﻿@{
+    if (ViewData["errors"].Equals(""))
+    {
+        @:<p>API Response</p>
+    }
+    else
+    {
+        @:<script>alert('@ViewData["errors"]');</script>
+    }
+
     var responseData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<dynamic>>(Model);
     var allMovies = new List<dynamic>();
 
@@ -13,15 +22,15 @@
             }
         }
 
-        <h1>API Response</h1>
+        <h1>Here's Your Recommendation</h1>
 
-        if (allMovies.Count > 0)
+        @if (allMovies.Count > 0)
         {
             var random = new Random();
             var selectedIndices = new HashSet<int>();
             var selectedMovies = new List<dynamic>();
 
-            while (selectedIndices.Count < 10 && selectedIndices.Count < allMovies.Count)
+            while (selectedIndices.Count < 20 && selectedIndices.Count < allMovies.Count)
             {
                 var randomIndex = random.Next(allMovies.Count);
                 if (selectedIndices.Contains(randomIndex))
@@ -31,18 +40,18 @@
                 selectedMovies.Add(allMovies[randomIndex]);
             }
 
-            <table border="2">
-                <thead>
-                    <tr style="background-color:yellow">
-                        <th>imdb_id</th>
-                        <th>title</th>
+            <table class="table table-bordered">
+                <thead class="thead-light">
+                    <tr>
+                        <th>IMDb Link</th>
+                        <th>Title</th>
                     </tr>
                 </thead>
                 <tbody>
                     @foreach (var result in selectedMovies)
                     {
                         <tr>
-                            <td>@result.imdb_id</td>
+                            <td><a href="https://www.imdb.com/title/@result.imdb_id">Go to IMDb</a></td>
                             <td>@result.title</td>
                         </tr>
                     }
