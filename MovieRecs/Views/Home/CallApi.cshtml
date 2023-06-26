@@ -1,0 +1,47 @@
+﻿@model string
+
+@{
+    var responseData = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Model);
+    var results = responseData?.results.ToObject<List<dynamic>>();
+}
+
+<h1>API Response</h1>
+
+@if (Model != null && results != null)
+{
+    var random = new Random();
+    var selectedIndices = new HashSet<int>();
+    var selectedMovies = new List<dynamic>();
+
+    while (selectedIndices.Count < 4 && selectedIndices.Count < results.Count)
+    {
+        var randomIndex = random.Next(results.Count);
+        if (selectedIndices.Contains(randomIndex))
+            continue;
+
+        selectedIndices.Add(randomIndex);
+        selectedMovies.Add(results[randomIndex]);
+    }
+
+    <table border="2">
+        <thead>
+            <tr style="background-color:yellow">
+                <th>imdb_id</th>
+                <th>title</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var result in selectedMovies)
+            {
+                <tr>
+                    <td>@result.imdb_id</td>
+                    <td>@result.title</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <p>No response received.</p>
+}
