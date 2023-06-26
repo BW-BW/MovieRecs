@@ -1,18 +1,38 @@
 ﻿@{
     ViewData["Title"] = "Home Page";
+
+    // Define the available film genres
+    List<string> filmGenres = new List<string>
+    {
+        "Action",
+        "Comedy",
+        "Drama",
+        "Horror",
+        "Romance",
+        "Sci-Fi",
+        "Thriller"
+    };
 }
 
 <div class="text-center">
     <h1 class="display-4">Welcome</h1>
     <p>Learn about <a href="https://docs.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
 
-    <button class="btn-info" asp-action="CallApi" asp-controller="Home">Call Api</button>
-@*    <form method="post">
-        <button type="submit" formaction="@Url.Action("CallApi", "Home")">Call API</button>
-    </form>*@
-
     <form method="post" action="@Url.Action("CallApi", "Home")">
         <button type="submit">Call API</button>
     </form>
 </div>
 
+<body>
+    <h2>Select Film Genres:</h2>
+
+    <form method="post" action="ProcessGenres">
+        @foreach (var genre in filmGenres)
+        {
+            <input type="checkbox" name="selectedGenres" value="@genre" /> @genre <br />
+        }
+
+        <br />
+        <input type="submit" value="Submit" />
+    </form>
+</body>

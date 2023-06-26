@@ -22,10 +22,25 @@ namespace MovieRecs.Controllers
         // GET: Users
         public async Task<IActionResult> Index()
         {
-              return _context.User != null ? 
-                          View(await _context.User.ToListAsync()) :
-                          Problem("Entity set 'MovieRecsContext.User'  is null.");
+            return _context.User != null ?
+                        View(await _context.User.ToListAsync()) :
+                        Problem("Entity set 'MovieRecsContext.User'  is null.");
         }
+
+        /*public async Task<IActionResult> Index(string username)
+        {
+            var user = await _context.User.FirstOrDefaultAsync(u => u.Username == username);
+
+            if (user != null)
+            {
+                return View(user);
+            }
+            else
+            {
+                return Problem("User not found.");
+            }
+        }*/
+
 
         // GET: Users/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -56,7 +71,7 @@ namespace MovieRecs.Controllers
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Username,Password")] User user)
+        public async Task<IActionResult> Create([Bind("Id,Username,Password,Genre1,Genre2,Genre3")] User user)
         {
             if (ModelState.IsValid)
             {

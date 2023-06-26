@@ -1,47 +1,61 @@
-﻿@model string
+﻿@{
+    var responseData = Newtonsoft.Json.JsonConvert.DeserializeObject<List<dynamic>>(Model);
+    var allMovies = new List<dynamic>();
 
-@{
-    var responseData = Newtonsoft.Json.JsonConvert.DeserializeObject<dynamic>(Model);
-    var results = responseData?.results.ToObject<List<dynamic>>();
-}
-
-<h1>API Response</h1>
-
-@if (Model != null && results != null)
-{
-    var random = new Random();
-    var selectedIndices = new HashSet<int>();
-    var selectedMovies = new List<dynamic>();
-
-    while (selectedIndices.Count < 4 && selectedIndices.Count < results.Count)
+    if (responseData != null)
     {
-        var randomIndex = random.Next(results.Count);
-        if (selectedIndices.Contains(randomIndex))
-            continue;
-
-        selectedIndices.Add(randomIndex);
-        selectedMovies.Add(results[randomIndex]);
-    }
-
-    <table border="2">
-        <thead>
-            <tr style="background-color:yellow">
-                <th>imdb_id</th>
-                <th>title</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var result in selectedMovies)
+        foreach (var response in responseData)
+        {
+            var results = response?.results.ToObject<List<dynamic>>();
+            if (results != null)
             {
-                <tr>
-                    <td>@result.imdb_id</td>
-                    <td>@result.title</td>
-                </tr>
+                allMovies.AddRange(results);
             }
-        </tbody>
-    </table>
-}
-else
-{
-    <p>No response received.</p>
+        }
+
+        <h1>API Response</h1>
+
+        if (allMovies.Count > 0)
+        {
+            var random = new Random();
+            var selectedIndices = new HashSet<int>();
+            var selectedMovies = new List<dynamic>();
+
+            while (selectedIndices.Count < 10 && selectedIndices.Count < allMovies.Count)
+            {
+                var randomIndex = random.Next(allMovies.Count);
+                if (selectedIndices.Contains(randomIndex))
+                    continue;
+
+                selectedIndices.Add(randomIndex);
+                selectedMovies.Add(allMovies[randomIndex]);
+            }
+
+            <table border="2">
+                <thead>
+                    <tr style="background-color:yellow">
+                        <th>imdb_id</th>
+                        <th>title</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var result in selectedMovies)
+                    {
+                        <tr>
+                            <td>@result.imdb_id</td>
+                            <td>@result.title</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>No movies found.</p>
+        }
+    }
+    else
+    {
+        <p>No response received.</p>
+    }
 }
